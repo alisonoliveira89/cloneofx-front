@@ -1,31 +1,31 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import TweetCard from '@/components/TweetCard';
-import MainLayout from '@/components/MainLayout';
-import NewTweetModal from '@/components/NewTweetModal';
-import { useRouter } from 'next/navigation';
-import UserSearch from '@/components/UserSearch';
+import { useEffect, useState } from 'react'
+import axios from 'axios'
+import TweetCard from '@/components/TweetCard'
+import MainLayout from '@/components/MainLayout'
+import NewTweetModal from '@/components/NewTweetModal'
+import { useRouter } from 'next/navigation'
+import UserSearch from '@/components/UserSearch'
 
 type Tweet = {
-  id: number;
-  user: string;
-  username: string;
-  content: string;
-  created_at: string;
-};
+  id: number
+  user: string
+  username: string
+  content: string
+  created_at: string
+}
 
 export default function FeedPage() {
-  const [tweets, setTweets] = useState<Tweet[]>([]);
-  const [showModal, setShowModal] = useState(false);
-  const router = useRouter();
+  const [tweets, setTweets] = useState<Tweet[]>([])
+  const [showModal, setShowModal] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token')
     if (!token) {
-      router.push('/login');
-      return;
+      router.push('/login')
+      return
     }
 
     axios
@@ -34,14 +34,14 @@ export default function FeedPage() {
       })
       .then((res) => setTweets(res.data))
       .catch(() => {
-        localStorage.removeItem('token');
-        router.push('/login');
-      });
-  }, []);
+        localStorage.removeItem('token')
+        router.push('/login')
+      })
+  }, [])
 
   function handleTweetCreated(newTweet: Tweet) {
-    setTweets([newTweet, ...tweets]);
-    setShowModal(false);
+    setTweets([newTweet, ...tweets])
+    setShowModal(false)
   }
 
   return (
@@ -69,11 +69,8 @@ export default function FeedPage() {
       </div>
 
       {showModal && (
-        <NewTweetModal
-          onClose={() => setShowModal(false)}
-          onTweetCreated={handleTweetCreated}
-        />
+        <NewTweetModal onClose={() => setShowModal(false)} onTweetCreated={handleTweetCreated} />
       )}
     </MainLayout>
-  );
+  )
 }

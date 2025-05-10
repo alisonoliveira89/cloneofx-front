@@ -1,25 +1,25 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import axios from 'axios';
-import { useAuth } from '@/contexts/AuthContext';
-import Link from 'next/link';
-import { IoSearch } from 'react-icons/io5';
+import { useState } from 'react'
+import axios from 'axios'
+import { useAuth } from '@/contexts/AuthContext'
+import Link from 'next/link'
+import { IoSearch } from 'react-icons/io5'
 
 interface User {
-  id: string;
-  username: string;
-  email: string;
+  id: string
+  username: string
+  email: string
 }
 
 export default function UserSearch() {
-  const [showInput, setShowInput] = useState(false);
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<User[]>([]);
-  const { token } = useAuth();
+  const [showInput, setShowInput] = useState(false)
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState<User[]>([])
+  const { token } = useAuth()
 
   const handleSearch = async () => {
-    if (!query || !token) return;
+    if (!query || !token) return
 
     try {
       const response = await axios.get(
@@ -27,12 +27,12 @@ export default function UserSearch() {
         {
           headers: { Authorization: `Bearer ${token}` },
         }
-      );
-      setResults(response.data);
+      )
+      setResults(response.data)
     } catch (err) {
-      console.error('Erro ao buscar usuários', err);
+      console.error('Erro ao buscar usuários', err)
     }
-  };
+  }
 
   return (
     <div className="text-white">
@@ -83,5 +83,5 @@ export default function UserSearch() {
         </div>
       )}
     </div>
-  );
+  )
 }
