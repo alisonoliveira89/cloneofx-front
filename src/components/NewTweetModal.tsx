@@ -1,21 +1,27 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import axios from 'axios';
+import { useState } from 'react'
+import axios from 'axios'
 
 type NewTweetModalProps = {
-  onClose: () => void;
-  onTweetCreated: (newTweet: { id: number; user: string; username: string; content: string; created_at: string }) => void;
-};
+  onClose: () => void
+  onTweetCreated: (newTweet: {
+    id: number
+    user: string
+    username: string
+    content: string
+    created_at: string
+  }) => void
+}
 
 export default function NewTweetModal({ onClose, onTweetCreated }: NewTweetModalProps) {
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState('')
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+    e.preventDefault()
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token')
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/tweets/`,
         { content },
@@ -24,11 +30,11 @@ export default function NewTweetModal({ onClose, onTweetCreated }: NewTweetModal
             Authorization: `Bearer ${token}`,
           },
         }
-      );
+      )
 
-      onTweetCreated(response.data);
+      onTweetCreated(response.data)
     } catch (err) {
-      alert('Erro ao criar tweet');
+      alert('Erro ao criar tweet')
     }
   }
 
@@ -63,5 +69,5 @@ export default function NewTweetModal({ onClose, onTweetCreated }: NewTweetModal
         </form>
       </div>
     </div>
-  );
+  )
 }

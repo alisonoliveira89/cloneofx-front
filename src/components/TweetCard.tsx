@@ -1,11 +1,11 @@
-import Link from 'next/link';
+import Link from 'next/link'
 
 type TweetProps = {
-  user: string; // ID do usuário
-  username: string;
-  content: string;
+  user: string // "ID do usuário"
+  username: string
+  content: string
   created_at: string
-};
+}
 
 export default function TweetCard({ user, username, content, created_at }: TweetProps) {
   return (
@@ -18,12 +18,10 @@ export default function TweetCard({ user, username, content, created_at }: Tweet
               @{username}
             </div>
           </Link>
-          <div className="text-gray-400 text-sm">
-            {new Date(created_at).toLocaleString()}
-          </div>
+          <div className="text-gray-400 text-sm">{new Date(created_at).toLocaleString()}</div>
           <p className="mt-2 text-gray-200">{content}</p>
         </div>
       </div>
     </div>
-  );
+  )
 }

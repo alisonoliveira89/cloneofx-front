@@ -1,82 +1,84 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import MainLayout from "@/components/MainLayout";
+import { useEffect, useState } from 'react'
+import axios from 'axios'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/contexts/AuthContext'
+import MainLayout from '@/components/MainLayout'
 
 interface Tweet {
-  id: string;
-  content: string;
-  created_at: string;
+  id: string
+  content: string
+  created_at: string
 }
 
 interface User {
-  id: string;
-  username: string;
-  email: string;
-  tweets: Tweet[];
+  id: string
+  username: string
+  email: string
+  tweets: Tweet[]
 }
 
 interface ProfilePageProps {
-  id: string;
+  id: string
 }
 
 const ProfilePage = ({ id }: ProfilePageProps) => {
-  const { token, userId, isLoading  } = useAuth();
-  const [user, setUser] = useState<User | null>(null);
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const { token, userId, isLoading } = useAuth()
+  const [user, setUser] = useState<User | null>(null)
+  const [isFollowing, setIsFollowing] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
-    if (isLoading) return; // Espera carregar
+    if (isLoading) return // Espera carregar
 
     if (!token) {
-      router.push('/login');
-      return;
+      router.push('/login')
+      return
     }
 
-    if (!id) return;
+    if (!id) return
 
     const fetchUserData = async () => {
       try {
         const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}/`, {
           headers: { Authorization: `Bearer ${token}` },
-        });
-        setUser(response.data);
+        })
+        setUser(response.data)
       } catch (err) {
-        setError("Erro ao carregar perfil");
-        console.error(err);
+        setError('Erro ao carregar perfil')
+        console.error(err)
       }
-    };
+    }
 
     const checkFollowing = async () => {
-        if (!token) return;
-      
-        try {
-          const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}/is_following/`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          setIsFollowing(response.data.is_following);
-        } catch (err) {
-          console.error("Erro ao verificar seguimento", err);
-        }
-    };
-      
+      if (!token) return
 
-    fetchUserData();
-    checkFollowing();
-  }, [id, token, userId, router, isLoading]);
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/users/${id}/is_following/`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        )
+        setIsFollowing(response.data.is_following)
+      } catch (err) {
+        console.error('Erro ao verificar seguimento', err)
+      }
+    }
+
+    fetchUserData()
+    checkFollowing()
+  }, [id, token, userId, router, isLoading])
 
   const handleFollowToggle = async () => {
-    if (!token) return;
-  
-    setLoading(true);
+    if (!token) return
+
+    setLoading(true)
     try {
-      const endpoint = isFollowing ? 'unfollow' : 'follow';
+      const endpoint = isFollowing ? 'unfollow' : 'follow'
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/users/${id}/${endpoint}/`,
         {},
@@ -85,36 +87,42 @@ const ProfilePage = ({ id }: ProfilePageProps) => {
             Authorization: `Bearer ${token}`,
           },
         }
-      );
-  
+      )
+
       if (endpoint === 'follow') {
         // Se a resposta indicar que já segue, mesmo com erro 200
         if (response.data.detail?.includes('já está seguindo')) {
-          setIsFollowing(true);
+          setIsFollowing(true)
         } else {
-          setIsFollowing(true);
+          setIsFollowing(true)
         }
       } else {
-        setIsFollowing(false);
+        setIsFollowing(false)
       }
     } catch (err: any) {
       // Se mesmo no catch o retorno indicar que já segue
-      if (
-        err?.response?.data?.detail &&
-        err.response.data.detail.includes('já está seguindo')
-      ) {
-        setIsFollowing(true);
+      if (err?.response?.data?.detail && err.response.data.detail.includes('já está seguindo')) {
+        setIsFollowing(true)
       } else {
-        console.error(`Erro ao ${isFollowing ? 'deixar de seguir' : 'seguir'} o usuário`, err);
+        console.error(`Erro ao ${isFollowing ? 'deixar de seguir' : 'seguir'} o usuário`, err)
       }
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
-  
+  }
 
-  if (error) return <MainLayout><p className="text-red-500 p-4">{error}</p></MainLayout>;
-  if (!user) return <MainLayout><p className="text-gray-500 p-4">Carregando perfil...</p></MainLayout>;
+  if (error)
+    return (
+      <MainLayout>
+        <p className="text-red-500 p-4">{error}</p>
+      </MainLayout>
+    )
+  if (!user)
+    return (
+      <MainLayout>
+        <p className="text-gray-500 p-4">Carregando perfil...</p>
+      </MainLayout>
+    )
 
   return (
     <MainLayout>
@@ -161,7 +169,7 @@ const ProfilePage = ({ id }: ProfilePageProps) => {
         </div>
       </div>
     </MainLayout>
-  );
-};
+  )
+}
 
-export default ProfilePage;
+export default ProfilePage

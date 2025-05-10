@@ -1,28 +1,28 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import axios from 'axios'
 
 export default function RegisterPage() {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const router = useRouter();
+  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const router = useRouter()
 
   async function handleRegister(e: React.FormEvent) {
-    e.preventDefault();
+    e.preventDefault()
 
     try {
       await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/users/register/`, {
         username,
         email,
         password,
-      });
-      alert('Cadastro realizado com sucesso!');
-      router.push('/login'); // ou direto para o feed, se quiser logar após o registro
+      })
+      alert('Cadastro realizado com sucesso!')
+      router.push('/login') // ou direto para o feed, se quiser logar após o registro
     } catch (err) {
-      alert('Erro ao registrar. Verifique os dados.');
+      alert('Erro ao registrar. Verifique os dados.')
     }
   }
 
@@ -76,5 +76,5 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

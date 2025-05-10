@@ -1,29 +1,29 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import axios from 'axios';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import axios from 'axios'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const { setAuthData } = useAuth(); // pega o setter do contexto
-  const router = useRouter();
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const { setAuthData } = useAuth() // pega o setter do contexto
+  const router = useRouter()
 
   async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
+    e.preventDefault()
     try {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/users/login/`, {
         username,
         password,
-      });
+      })
       // Salva no contexto + localStorage
-      setAuthData(response.data.user_id, response.data.access);
-      
-      router.push('/feed');
+      setAuthData(response.data.user_id, response.data.access)
+
+      router.push('/feed')
     } catch (err) {
-      alert('Login inválido');
+      alert('Login inválido')
     }
   }
 
@@ -31,11 +31,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen bg-black text-white">
       {/* Lado esquerdo: logo */}
       <div className="w-1/2 flex items-center justify-center p-12">
-        <img
-          src="/icons/x-logo.svg"
-          alt="Logo X"
-          className="max-h-[380px] h-1/2 object-contain"
-        />
+        <img src="/icons/x-logo.svg" alt="Logo X" className="max-h-[380px] h-1/2 object-contain" />
       </div>
 
       {/* Lado direito: conteúdo */}
@@ -81,5 +77,5 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }
