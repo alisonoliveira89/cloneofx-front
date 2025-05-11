@@ -76,10 +76,6 @@ export default function UserSearch() {
               ))}
             </ul>
           )}
-
-          {results.length === 0 && query && (
-            <p className="text-sm text-gray-500">Nenhum usuário encontrado.</p>
-          )}
         </div>
       )}
     </div>

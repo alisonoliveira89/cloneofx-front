@@ -3,20 +3,18 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 import MainLayout from '@/components/MainLayout'
-
-interface Tweet {
-  id: string
-  content: string
-  created_at: string
-}
+import TweetCard from '@/components/TweetCard'
+import { Tweet } from '@/types/tweet'
 
 interface User {
-  id: string
+  id: number
   username: string
   email: string
-  tweets: Tweet[]
+  followers_count: number
+  following_count: number
 }
 
 interface ProfilePageProps {
@@ -26,115 +24,137 @@ interface ProfilePageProps {
 const ProfilePage = ({ id }: ProfilePageProps) => {
   const { token, userId, isLoading } = useAuth()
   const [user, setUser] = useState<User | null>(null)
+  const [tweets, setTweets] = useState<Tweet[]>([])
   const [isFollowing, setIsFollowing] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
   const router = useRouter()
 
+  const isMyProfile = userId === id
+
   useEffect(() => {
-    if (isLoading) return // Espera carregar
+    if (isLoading || !token || !id) return
 
-    if (!token) {
-      router.push('/login')
-      return
-    }
+    const headers = { Authorization: `Bearer ${token}` }
 
-    if (!id) return
-
-    const fetchUserData = async () => {
+    const fetchUser = async () => {
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}/`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        setUser(response.data)
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}/`, { headers })
+        setUser(res.data)
+        if (!isMyProfile) {
+          setTweets(res.data.tweets)
+        }
       } catch (err) {
         setError('Erro ao carregar perfil')
-        console.error(err)
       }
     }
 
-    const checkFollowing = async () => {
-      if (!token) return
-
+    const fetchTweets = async () => {
       try {
-        const response = await axios.get(
+        if (isMyProfile) {
+          const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/tweets/my/`, {
+            headers,
+          })
+          setTweets(res.data)
+        }
+      } catch (err) {
+        console.error('Erro ao carregar tweets', err)
+      }
+    }
+
+    const fetchFollowingStatus = async () => {
+      if (isMyProfile) return
+      try {
+        const res = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/users/${id}/is_following/`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers }
         )
-        setIsFollowing(response.data.is_following)
+        setIsFollowing(res.data.is_following)
       } catch (err) {
         console.error('Erro ao verificar seguimento', err)
       }
     }
 
-    fetchUserData()
-    checkFollowing()
-  }, [id, token, userId, router, isLoading])
+    fetchUser()
+    fetchTweets()
+    fetchFollowingStatus()
+  }, [id, token, userId, isLoading])
 
   const handleFollowToggle = async () => {
     if (!token) return
-
     setLoading(true)
     try {
       const endpoint = isFollowing ? 'unfollow' : 'follow'
-      const response = await axios.post(
+      await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/users/${id}/${endpoint}/`,
         {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       )
-
-      if (endpoint === 'follow') {
-        // Se a resposta indicar que já segue, mesmo com erro 200
-        if (response.data.detail?.includes('já está seguindo')) {
-          setIsFollowing(true)
-        } else {
-          setIsFollowing(true)
-        }
-      } else {
-        setIsFollowing(false)
-      }
-    } catch (err: any) {
-      // Se mesmo no catch o retorno indicar que já segue
-      if (err?.response?.data?.detail && err.response.data.detail.includes('já está seguindo')) {
-        setIsFollowing(true)
-      } else {
-        console.error(`Erro ao ${isFollowing ? 'deixar de seguir' : 'seguir'} o usuário`, err)
-      }
+      setIsFollowing(!isFollowing)
+      setUser((prev) =>
+        prev
+          ? {
+              ...prev,
+              followers_count: isFollowing ? prev.followers_count - 1 : prev.followers_count + 1,
+            }
+          : null
+      )
+    } catch (err) {
+      console.error(err)
     } finally {
       setLoading(false)
     }
   }
 
-  if (error)
+  const handleDeleteTweet = (tweetId: number) => {
+    setTweets((prev) => prev.filter((t) => t.id !== tweetId))
+  }
+
+  const handleTweetCreated = (newTweet: Tweet) => {
+    setTweets((prev) => [newTweet, ...prev])
+  }
+
+  if (error) {
     return (
       <MainLayout>
         <p className="text-red-500 p-4">{error}</p>
       </MainLayout>
     )
-  if (!user)
+  }
+
+  if (!user) {
     return (
       <MainLayout>
         <p className="text-gray-500 p-4">Carregando perfil...</p>
       </MainLayout>
     )
+  }
 
   return (
-    <MainLayout>
+    <MainLayout onTweetCreatedGlobal={isMyProfile ? handleTweetCreated : undefined}>
       <div className="p-4">
-        {/* Perfil do usuário com avatar */}
+        {/* Perfil */}
         <div className="flex items-center gap-4 mb-6">
           <div className="w-14 h-14 rounded-full bg-gray-300" />
           <div>
             <h1 className="text-xl font-bold">{user.username}</h1>
             <p className="text-gray-500 text-sm">{user.email}</p>
+            <div className="flex gap-4 text-sm text-gray-500 mt-1">
+              <Link href={`/profile/${id}/follows/following`} className="hover:underline">
+                <span>
+                  <strong className="text-white">{user.following_count}</strong> seguindo
+                </span>
+              </Link>
+              <Link href={`/profile/${id}/follows/followers`} className="hover:underline">
+                <span>
+                  <strong className="text-white">{user.followers_count}</strong> seguidores
+                </span>
+              </Link>
+            </div>
           </div>
-          {user.id !== userId && (
+
+          {!isMyProfile && (
             <div className="ml-auto">
               <button
                 onClick={handleFollowToggle}
@@ -154,14 +174,14 @@ const ProfilePage = ({ id }: ProfilePageProps) => {
         {/* Tweets */}
         <h2 className="text-lg font-semibold mb-3">Tweets</h2>
         <div className="space-y-4">
-          {user.tweets.length > 0 ? (
-            user.tweets.map((tweet) => (
-              <div key={tweet.id} className="p-4 border border-gray-200 rounded-lg shadow-sm">
-                <p className="text-gray-800">{tweet.content}</p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {new Date(tweet.created_at).toLocaleString()}
-                </p>
-              </div>
+          {tweets.length > 0 ? (
+            tweets.map((tweet) => (
+              <TweetCard
+                key={tweet.id}
+                {...tweet}
+                userId={userId ?? undefined}
+                onDelete={handleDeleteTweet}
+              />
             ))
           ) : (
             <p className="text-gray-400">Este usuário ainda não tweetou.</p>

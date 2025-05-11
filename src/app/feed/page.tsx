@@ -8,28 +8,27 @@ import NewTweetModal from '@/components/NewTweetModal'
 import { useRouter } from 'next/navigation'
 import UserSearch from '@/components/UserSearch'
 
-type Tweet = {
-  id: number
-  user: string
-  username: string
-  content: string
-  created_at: string
-}
+import { Tweet } from '@/types/tweet'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function FeedPage() {
   const [tweets, setTweets] = useState<Tweet[]>([])
   const [showModal, setShowModal] = useState(false)
+  const [view, setView] = useState<'feed' | 'my'>('feed')
   const router = useRouter()
+  const { userId } = useAuth()
 
-  useEffect(() => {
+  const fetchTweets = () => {
     const token = localStorage.getItem('token')
     if (!token) {
       router.push('/login')
       return
     }
 
+    const endpoint = view === 'feed' ? '/tweets/feed/' : '/tweets/my/'
+
     axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/tweets/feed/`, {
+      .get(`${process.env.NEXT_PUBLIC_API_URL}${endpoint}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setTweets(res.data))
@@ -37,23 +36,32 @@ export default function FeedPage() {
         localStorage.removeItem('token')
         router.push('/login')
       })
-  }, [])
+  }
+
+  useEffect(() => {
+    fetchTweets()
+  }, [view])
 
   function handleTweetCreated(newTweet: Tweet) {
-    setTweets([newTweet, ...tweets])
+    setTweets((prev) => [newTweet, ...prev])
     setShowModal(false)
+  }
+
+  function handleDeleteTweet(id: number) {
+    setTweets((prev) => prev.filter((tweet) => tweet.id !== id))
   }
 
   return (
     <MainLayout>
       <div className="p-4">
-        <div className="flex justify-between items-center mb-4">
+        {/* Toggle entre feeds */}
+        <div className="flex items-center gap-4 mb-4">
           <h1 className="text-xl font-bold">Seu Feed</h1>
           <button
-            onClick={() => setShowModal(true)}
-            className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"
+            onClick={() => setView(view === 'feed' ? 'my' : 'feed')}
+            className="px-4 py-2 bg-transparent border border-gray-600 rounded-full text-sm text-white hover:bg-zinc-800 transition duration-200 cursor-pointer"
           >
-            Novo Tweet
+            {view === 'feed' ? 'Ver meus tweets' : 'Ver feed geral'}
           </button>
         </div>
 
@@ -64,7 +72,12 @@ export default function FeedPage() {
         {tweets.length === 0 && <p className="text-gray-400">Nenhum tweet encontrado.</p>}
 
         {tweets.map((tweet) => (
-          <TweetCard key={tweet.id} {...tweet} />
+          <TweetCard
+            key={tweet.id}
+            {...tweet}
+            userId={userId ?? undefined}
+            onDelete={handleDeleteTweet}
+          />
         ))}
       </div>
 
