@@ -8,22 +8,26 @@ import { useAuth } from '@/contexts/AuthContext'
 export default function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
   const { setAuthData } = useAuth() // pega o setter do contexto
   const router = useRouter()
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
+    setLoading(true)
     try {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/users/login/`, {
         username,
         password,
       })
       // Salva no contexto + localStorage
-      setAuthData(response.data.user_id, response.data.access)
+      setAuthData(response.data.user_id, response.data.access, response.data.username)
 
       router.push('/feed')
     } catch (err) {
       alert('Login inválido')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -59,9 +63,21 @@ export default function LoginPage() {
             />
             <button
               type="submit"
-              className="w-full px-3 py-2 text-sm bg-white text-black font-bold rounded-full hover:bg-gray-200 transition duration-300"
+              disabled={loading}
+              className={`w-full px-3 py-2 text-sm font-bold rounded-full transition duration-300 flex items-center justify-center gap-2 ${
+                loading
+                  ? 'bg-gray-600 text-white cursor-not-allowed'
+                  : 'bg-white text-black hover:bg-gray-200'
+              }`}
             >
-              Entrar
+              {loading ? (
+                <>
+                  <img src="/icons/x-logo.svg" alt="Loading" className="w-5 h-5 animate-spin" />
+                  Entrando...
+                </>
+              ) : (
+                'Entrar'
+              )}
             </button>
           </form>
 
