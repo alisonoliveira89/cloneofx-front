@@ -51,7 +51,7 @@ export default function TweetCard({
       )
       setLiked(res.data.liked)
       setLikes((prev) => prev + (res.data.liked ? 1 : -1))
-    } catch (err) {
+    } catch (_) {
       console.error('Erro ao curtir:', err)
     }
   }
@@ -69,7 +69,7 @@ export default function TweetCard({
       })
       toast.success('Tweet excluído com sucesso!')
       onDelete?.(id)
-    } catch (err) {
+    } catch (_) {
       toast.error('Erro ao excluir tweet')
       console.error(err)
     }

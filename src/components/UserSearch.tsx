@@ -29,7 +29,7 @@ export default function UserSearch() {
         }
       )
       setResults(response.data)
-    } catch (err) {
+    } catch (_) {
       console.error('Erro ao buscar usuários', err)
     }
   }
