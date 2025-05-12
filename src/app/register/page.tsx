@@ -20,16 +20,21 @@ export default function RegisterPage() {
         password,
       })
       alert('Cadastro realizado com sucesso!')
-      router.push('/login') // ou direto para o feed, se quiser logar após o registro
+      router.push('/login')
     } catch (err) {
       alert('Erro ao registrar. Verifique os dados.')
     }
   }
 
   return (
-    <div className="flex min-h-screen bg-black text-white">
-      <div className="w-full max-w-md mx-auto my-auto px-6 py-12">
-        <h1 className="text-4xl font-extrabold mb-6">Crie sua conta</h1>
+    <div className="flex min-h-screen bg-black text-white items-center justify-center">
+      <div className="w-full max-w-md px-6 py-12">
+        {/* Logo centralizado */}
+        <div className="flex justify-center mb-6">
+          <img src="/icons/x-logo.svg" alt="Logo X" className="w-12 h-12 object-contain" />
+        </div>
+
+        <h1 className="text-4xl font-extrabold mb-6 text-center">Crie sua conta</h1>
 
         <form onSubmit={handleRegister} className="space-y-4">
           <input

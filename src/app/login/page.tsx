@@ -32,16 +32,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-black text-white">
+    <div className="flex flex-col md:flex-row min-h-screen bg-black text-white">
       {/* Lado esquerdo: logo */}
-      <div className="w-1/2 flex items-center justify-center p-12">
-        <img src="/icons/x-logo.svg" alt="Logo X" className="max-h-[380px] h-1/2 object-contain" />
+      <div className="w-full md:w-1/2 flex items-center justify-center p-6 sm:p-8 md:p-12">
+        <img src="/icons/x-logo.svg" alt="Logo X" className="max-h-[220px] h-1/2 object-contain" />
       </div>
 
       {/* Lado direito: conteúdo */}
-      <div className="w-1/2 flex flex-col justify-center p-12">
-        <h1 className="text-5xl font-extrabold">Acontecendo agora</h1>
-        <h2 className="text-2xl font-bold mt-4 mb-6">Entre no X</h2>
+      <div className="w-full md:w-1/2 flex flex-col justify-center p-6 sm:p-8 md:p-12">
+        <h1 className="text-4xl sm:text-5xl font-extrabold">Acontecendo agora</h1>
+        <h2 className="text-xl sm:text-2xl font-bold mt-4 mb-6">Entre no X</h2>
 
         <div className="w-full max-w-sm">
           <form onSubmit={handleLogin} className="space-y-3">
