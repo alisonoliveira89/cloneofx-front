@@ -21,7 +21,7 @@ export default function RegisterPage() {
       })
       alert('Cadastro realizado com sucesso!')
       router.push('/login')
-    } catch (_) {
+    } catch (err) {
       alert('Erro ao registrar. Verifique os dados.')
     }
   }

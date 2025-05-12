@@ -44,7 +44,7 @@ export default function NewTweetModal({ onClose, onTweetCreated }: NewTweetModal
       )
       onTweetCreated(response.data)
       toast.success('Tweet publicado com sucesso!')
-    } catch (_) {
+    } catch (err) {
       alert('Erro ao criar tweet')
       toast.error('Erro ao criar tweet')
     }

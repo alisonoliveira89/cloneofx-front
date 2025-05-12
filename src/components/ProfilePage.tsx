@@ -45,7 +45,7 @@ const ProfilePage = ({ id }: ProfilePageProps) => {
         if (!isMyProfile) {
           setTweets(res.data.tweets)
         }
-      } catch (_) {
+      } catch (err) {
         setError('Erro ao carregar perfil')
       }
     }
@@ -58,7 +58,7 @@ const ProfilePage = ({ id }: ProfilePageProps) => {
           })
           setTweets(res.data)
         }
-      } catch (_) {
+      } catch (err) {
         console.error('Erro ao carregar tweets', err)
       }
     }
@@ -71,7 +71,7 @@ const ProfilePage = ({ id }: ProfilePageProps) => {
           { headers }
         )
         setIsFollowing(res.data.is_following)
-      } catch (_) {
+      } catch (err) {
         console.error('Erro ao verificar seguimento', err)
       }
     }
@@ -100,7 +100,7 @@ const ProfilePage = ({ id }: ProfilePageProps) => {
             }
           : null
       )
-    } catch (_) {
+    } catch (err) {
       console.error(err)
     } finally {
       setLoading(false)
