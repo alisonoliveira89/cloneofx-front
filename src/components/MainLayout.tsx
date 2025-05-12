@@ -122,6 +122,27 @@ export default function MainLayout({
           {/* ... */}
         </aside>
       </div>
+
+      {/* Navbar inferior para mobile */}
+      {userId && (
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around items-center h-14 z-50">
+          <Link href="/feed" className="flex flex-col items-center text-white hover:text-blue-400">
+            <BiHomeAlt2 size={24} />
+          </Link>
+          <Link
+            href={`/profile/${userId}`}
+            className="flex flex-col items-center text-white hover:text-blue-400"
+          >
+            <IoMdContact size={24} />
+          </Link>
+          <button
+            onClick={() => setShowModal(true)}
+            className="flex items-center justify-center w-10 h-10 bg-white text-black rounded-full hover:bg-gray-200 transition"
+          >
+            +
+          </button>
+        </nav>
+      )}
     </>
   )
 }
