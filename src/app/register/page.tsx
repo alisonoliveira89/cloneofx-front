@@ -23,6 +23,7 @@ export default function RegisterPage() {
       router.push('/login')
     } catch (err) {
       alert('Erro ao registrar. Verifique os dados.')
+      console.error(err)
     }
   }
 

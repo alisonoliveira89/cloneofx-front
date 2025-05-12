@@ -47,6 +47,7 @@ const ProfilePage = ({ id }: ProfilePageProps) => {
         }
       } catch (err) {
         setError('Erro ao carregar perfil')
+        console.error(err)
       }
     }
 
