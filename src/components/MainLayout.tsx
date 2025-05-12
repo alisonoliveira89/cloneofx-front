@@ -3,9 +3,7 @@
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { usePathname } from 'next/navigation'
-
+import { useRouter, usePathname } from 'next/navigation'
 import NewTweetModal from './NewTweetModal'
 import ModalPortal from './ModalPortal'
 
@@ -21,11 +19,11 @@ export default function MainLayout({
   children: React.ReactNode
   onTweetCreatedGlobal?: (tweet: Tweet) => void
 }) {
-  const pathname = usePathname()
   const { userId, username, logout } = useAuth()
   const [showMenu, setShowMenu] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const router = useRouter()
+  const pathname = usePathname()
 
   const handleTweetCreated = (newTweet: Tweet) => {
     setShowModal(false)
@@ -34,16 +32,16 @@ export default function MainLayout({
 
   return (
     <>
-      {/* Modal sobreposto à página */}
+      {/* Modal para novo tweet */}
       {showModal && (
         <ModalPortal>
           <NewTweetModal onClose={() => setShowModal(false)} onTweetCreated={handleTweetCreated} />
         </ModalPortal>
       )}
 
-      <div className="min-h-screen flex flex-col md:flex-row max-w-6xl mx-auto relative z-0">
-        {/* Esquerda */}
-        <aside className="hidden md:flex flex-col justify-between w-full md:w-1/4 border-r border-gray-200 p-4 text-white">
+      <div className="min-h-screen flex max-w-6xl mx-auto relative z-0">
+        {/* Sidebar esquerda */}
+        <aside className="hidden md:flex flex-col justify-between w-1/4 border-r border-gray-200 p-4 text-white h-screen sticky top-0">
           <div>
             <div className="mb-6">
               <img src="/icons/x-logo.svg" alt="Logo X" className="w-10 h-10 object-contain" />
@@ -52,7 +50,7 @@ export default function MainLayout({
               <Link
                 href="/feed"
                 className={`flex items-center gap-3 px-2 py-1 rounded hover:bg-zinc-800 transition ${
-                  pathname === '/feed' ? 'border-l-4 border-gray-300 text-gray-100 bg-zinc-800' : ''
+                  pathname === '/feed' ? 'bg-zinc-800 text-white font-bold' : ''
                 }`}
               >
                 <BiHomeAlt2 size={26} />
@@ -63,9 +61,7 @@ export default function MainLayout({
                 <Link
                   href={`/profile/${userId}`}
                   className={`flex items-center gap-3 px-2 py-1 rounded hover:bg-zinc-800 transition ${
-                    pathname === `/profile/${userId}`
-                      ? 'border-l-4 border-gray-300 text-gray-100 bg-zinc-800'
-                      : ''
+                    pathname === `/profile/${userId}` ? 'bg-zinc-800 text-white font-bold' : ''
                   }`}
                 >
                   <IoMdContact size={26} />
@@ -82,7 +78,7 @@ export default function MainLayout({
             </nav>
           </div>
 
-          {/* Avatar + nome + logout */}
+          {/* Avatar e logout */}
           {userId && username && (
             <div className="relative mt-6">
               <div
@@ -113,28 +109,41 @@ export default function MainLayout({
           )}
         </aside>
 
-        {/* Conteúdo */}
-        <main className="w-full md:flex-1 border-x border-gray-200 relative z-0">{children}</main>
+        {/* Conteúdo central com rolagem */}
+        <main className="w-full md:flex-1 border-x border-gray-200 h-screen overflow-y-auto scroll-smooth">
+          {children}
+        </main>
 
-        {/* Direita */}
-        <aside className="hidden lg:block lg:w-1/4 p-4">
+        {/* Sidebar direita */}
+        <aside className="hidden lg:block lg:w-1/4 p-4 sticky top-0 h-screen overflow-y-auto">
           <h2 className="font-semibold">Trends</h2>
           {/* ... */}
         </aside>
       </div>
 
-      {/* Navbar inferior para mobile */}
+      {/* Menu inferior mobile */}
       {userId && (
         <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around items-center h-14 z-50">
-          <Link href="/feed" className="flex flex-col items-center text-white hover:text-blue-400">
-            <BiHomeAlt2 size={24} />
+          <Link
+            href="/feed"
+            className={`flex flex-col items-center justify-center w-10 h-10 rounded-full ${
+              pathname === '/feed' ? 'bg-gray-500 text-white' : 'text-white hover:text-blue-400'
+            }`}
+          >
+            <BiHomeAlt2 size={22} />
           </Link>
+
           <Link
             href={`/profile/${userId}`}
-            className="flex flex-col items-center text-white hover:text-blue-400"
+            className={`flex flex-col items-center justify-center w-10 h-10 rounded-full ${
+              pathname === `/profile/${userId}`
+                ? 'bg-gray-500 text-white'
+                : 'text-white hover:text-blue-400'
+            }`}
           >
-            <IoMdContact size={24} />
+            <IoMdContact size={22} />
           </Link>
+
           <button
             onClick={() => setShowModal(true)}
             className="flex items-center justify-center w-10 h-10 bg-white text-black rounded-full hover:bg-gray-200 transition"
