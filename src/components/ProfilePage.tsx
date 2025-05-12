@@ -31,7 +31,7 @@ const ProfilePage = ({ id }: ProfilePageProps) => {
 
   const router = useRouter()
 
-  const isMyProfile = userId === id
+  const isMyProfile = userId && Number(userId) === user?.id
 
   useEffect(() => {
     if (isLoading || !token || !id) return
