@@ -24,7 +24,7 @@ export default function LoginPage() {
       setAuthData(response.data.user_id, response.data.access, response.data.username)
 
       router.push('/feed')
-    } catch (err) {
+    } catch (_) {
       alert('Login inválido')
     } finally {
       setLoading(false)
