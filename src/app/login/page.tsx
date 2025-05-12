@@ -29,6 +29,7 @@ export default function LoginPage() {
       router.push('/feed')
     } catch (err) {
       alert('Login inválido')
+      console.error(err)
     } finally {
       setLoading(false)
     }
